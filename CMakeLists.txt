@@ -25,6 +25,11 @@ FetchContent_MakeAvailable(googletest)
 
 include_directories(${CMAKE_SOURCE_DIR}/include)
 
+add_library(poker_core STATIC
+    src/evaluator.cpp
+    src/tables.cpp
+)
+
 enable_testing()
 
 add_executable(cards_test test/cards_test.cpp)
@@ -34,3 +39,7 @@ add_test(NAME cards_test COMMAND cards_test)
 add_executable(prng_test test/prng_test.cpp)
 target_link_libraries(prng_test PRIVATE gtest_main)
 add_test(NAME prng_test COMMAND prng_test)
+
+add_executable(evaluator_test test/evaluator_test.cpp)
+target_link_libraries(evaluator_test PRIVATE gtest_main poker_core)
+add_test(NAME evaluator_test COMMAND evaluator_test)
