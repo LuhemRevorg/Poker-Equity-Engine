@@ -28,7 +28,11 @@ include_directories(${CMAKE_SOURCE_DIR}/include)
 add_library(poker_core STATIC
     src/evaluator.cpp
     src/tables.cpp
+    src/simulator.cpp
 )
+
+add_executable(poker-equity src/main.cpp)
+target_link_libraries(poker-equity PRIVATE poker_core)
 
 enable_testing()
 
@@ -43,3 +47,7 @@ add_test(NAME prng_test COMMAND prng_test)
 add_executable(evaluator_test test/evaluator_test.cpp)
 target_link_libraries(evaluator_test PRIVATE gtest_main poker_core)
 add_test(NAME evaluator_test COMMAND evaluator_test)
+
+add_executable(simulator_test test/simulator_test.cpp)
+target_link_libraries(simulator_test PRIVATE gtest_main poker_core)
+add_test(NAME simulator_test COMMAND simulator_test)
