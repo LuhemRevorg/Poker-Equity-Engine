@@ -7,6 +7,7 @@
 #include "cards.h"
 #include "evaluator.h"
 #include "prng.h"
+#include "range.h"
 #include "simulator.h"
 
 using namespace poker;
@@ -115,6 +116,43 @@ TEST_F(SimulatorTest, RoyalOnBoardForcesTie) {
     EXPECT_EQ(r.wins, 0u);
     EXPECT_EQ(r.losses, 0u);
     EXPECT_EQ(r.equity(), 0.5);
+}
+
+// ─── Range-based simulator ───────────────────────────────────────────────────
+// Now that the range parser exists, validate that hand-vs-range and
+// range-vs-range simulations produce textbook equities.
+
+TEST_F(SimulatorTest, HandVsRandom) {
+    // AsAh vs uniform random opponent. By suit symmetry every specific AA
+    // combo has the same equity vs random, so this hits the textbook 85.20%.
+    Hand hero = make_hand({"As", "Ah"});
+    auto vill = *Range::parse("random");
+    Xoshiro256pp rng(0xDEC0DE00ULL);
+    auto r = simulate(hero, vill, 0, kSims, rng);
+    std::cerr << "[INFO] AsAh vs random: equity=" << r.equity()
+              << " (completed=" << r.total << ")\n";
+    EXPECT_NEAR(r.equity(), 0.8520, kTol);
+}
+
+TEST_F(SimulatorTest, AAvsRandom_RangeAveraged) {
+    // The published "AA vs random hand = 85.20%" averaged over all 6 AA combos.
+    auto hero = *Range::parse("AA");
+    auto vill = *Range::parse("random");
+    Xoshiro256pp rng(0xCAFE00C0ULL);
+    auto r = simulate(hero, vill, 0, kSims, rng);
+    std::cerr << "[INFO] AA vs random: equity=" << r.equity() << "\n";
+    EXPECT_NEAR(r.equity(), 0.8520, kTol);
+}
+
+TEST_F(SimulatorTest, RandomVsRandom) {
+    // By symmetry, two uniform-random hands must have equal expected equity.
+    // Ties pull the result to exactly 0.5.
+    auto hero = *Range::parse("random");
+    auto vill = *Range::parse("random");
+    Xoshiro256pp rng(0x12345678ULL);
+    auto r = simulate(hero, vill, 0, kSims, rng);
+    std::cerr << "[INFO] random vs random: equity=" << r.equity() << "\n";
+    EXPECT_NEAR(r.equity(), 0.5, kTol);
 }
 
 // ─── Throughput info ─────────────────────────────────────────────────────────

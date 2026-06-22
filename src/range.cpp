@@ -215,6 +215,12 @@ bool parse_chunk(std::string_view chunk, std::vector<ComboEntry>& out) {
 
 }  // namespace
 
+Range Range::from_hand(Hand cards) {
+    Range r;
+    r.combos_.push_back({cards, 1.0});
+    return r;
+}
+
 std::optional<Range> Range::parse(std::string_view text) {
     Range r;
 

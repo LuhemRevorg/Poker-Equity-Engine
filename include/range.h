@@ -42,6 +42,10 @@ class Range {
     // if the result would be empty.
     static std::optional<Range> parse(std::string_view text);
 
+    // Construct a degenerate Range containing exactly the given 2-card combo.
+    // Useful for passing a specific Hand to APIs that take a Range.
+    static Range from_hand(Hand cards);
+
     size_t size() const { return combos_.size(); }
     bool   empty() const { return combos_.empty(); }
     const std::vector<ComboEntry>& combos() const { return combos_; }

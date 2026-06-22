@@ -4,6 +4,7 @@
 
 #include "cards.h"
 #include "prng.h"
+#include "range.h"
 
 namespace poker {
 
@@ -36,6 +37,18 @@ struct EquityResult {
 // without replacement from the undealt cards via a Fisher-Yates partial shuffle,
 // then evaluates both 7-card hands and records win/tie/loss.
 EquityResult simulate(Hand hero, Hand villain, Hand board,
+                      uint64_t n_sims, Xoshiro256pp& rng);
+
+// Range-vs-range Monte Carlo equity. Each sim samples one combo uniformly from
+// each side, rejection-sampling the villain combo if it conflicts with the
+// chosen hero combo, then samples the missing board cards. If a sim cannot
+// find a compatible (hero, villain) pair within an internal retry budget it
+// is skipped and not counted in `EquityResult::total`.
+EquityResult simulate(const Range& hero, const Range& villain, Hand board,
+                      uint64_t n_sims, Xoshiro256pp& rng);
+
+// Convenience: hero is a single fixed combo, villain is a range.
+EquityResult simulate(Hand hero, const Range& villain, Hand board,
                       uint64_t n_sims, Xoshiro256pp& rng);
 
 }  // namespace poker
