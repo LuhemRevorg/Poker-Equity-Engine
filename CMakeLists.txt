@@ -29,6 +29,7 @@ add_library(poker_core STATIC
     src/evaluator.cpp
     src/tables.cpp
     src/simulator.cpp
+    src/range.cpp
 )
 
 add_executable(poker-equity src/main.cpp)
@@ -51,3 +52,7 @@ add_test(NAME evaluator_test COMMAND evaluator_test)
 add_executable(simulator_test test/simulator_test.cpp)
 target_link_libraries(simulator_test PRIVATE gtest_main poker_core)
 add_test(NAME simulator_test COMMAND simulator_test)
+
+add_executable(range_test test/range_test.cpp)
+target_link_libraries(range_test PRIVATE gtest_main poker_core)
+add_test(NAME range_test COMMAND range_test)
